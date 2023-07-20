@@ -43,16 +43,16 @@
         </config-file>
         	<!-- background-geolocation -->
 	<config-file parent="NSLocationAlwaysAndWhenInUseUsageDescription" target="*-Info.plist">
-		<string>[CHANGEME] Background location tracking is required for our app so we can...</string>
+		<string>Localização mesmo quando não esta usando o App: Permitir a localização em segundo plano é necessária mesmo quando não esta com app aberto para garantir que possamos entregar ofertas de cargas aonde estiver</string>
     	</config-file>
     	<config-file parent="NSLocationAlwaysUsageDescription" target="*-Info.plist">
-        	<string>[CHANGEME pre-iOS11.  No longer used with iOS 12] Background location tracking is required for our app so we can...</string>
+        	<string>A localização em segundo plano é necessária para garantirmos entrega de ofertas de cargas em seu perfil.</string>
     	</config-file>
     	<config-file parent="NSLocationWhenInUseUsageDescription" target="*-Info.plist">
-        	<string>[CHANGEME] Background location tracking is required for our app so we can...</string>
+        	<string>A localização em segundo plano é necessária para garantirmos entrega de ofertas de cargas em seu perfil.</string>
     	</config-file>
     	<config-file parent="NSMotionUsageDescription" target="*-Info.plist">
-        	<string>[CHANGEME] Device motion updates help determine when the device is stationary so the app can save power by turning off location-updates</string>
+        	<string>A movimentação do aparelho ajuda a determinar quando o aparelho está parado e então desligar as atualizações em segundo plano da sua localização, preservando a bateria</string>
     	</config-file>
 	 <!-- /background-geolocation -->
 
