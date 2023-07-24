@@ -49,10 +49,13 @@
         	<string>A localização em segundo plano é necessária para garantirmos entrega de ofertas de cargas em seu perfil.</string>
     	</config-file>
     	<config-file parent="NSLocationWhenInUseUsageDescription" target="*-Info.plist">
-        	<string>A localização em segundo plano é necessária para garantirmos entrega de ofertas de cargas em seu perfil.</string>
+        	<string>A localização é necessária para garantirmos entrega de ofertas de cargas em seu perfil.</string>
     	</config-file>
     	<config-file parent="NSMotionUsageDescription" target="*-Info.plist">
         	<string>A movimentação do aparelho ajuda a determinar quando o aparelho está parado e então desligar as atualizações em segundo plano da sua localização, preservando a bateria</string>
+    	</config-file>
+	<config-file parent="NSUserTrackingUsageDescription" target="*-Info.plist">
+        	<string>A localização é necessária para garantirmos entrega de ofertas de cargas em seu perfil.</string>
     	</config-file>
 	 <!-- /background-geolocation -->
 
