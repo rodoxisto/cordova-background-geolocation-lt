@@ -141,7 +141,7 @@ declare module "cordova-background-geolocation-lt" {
     * | 408   | Location timeout            |
     * | 499   | Location request cancelled  |
 	*/
-	type LocationError = 0 | 1 | 2 | 408 | 499;
+	type LocationError = 0 | 1 | 2 | 3 | 408 | 499;
 
 	/**
 	* iOS Location authorization request.
@@ -156,7 +156,7 @@ declare module "cordova-background-geolocation-lt" {
 
 	type PersistMode = -1 | 0 | 1 | 2;
 
-	type Extras = {[key: string]: string|null|number|boolean|Extras|string[]|number[]|boolean[]|Extras[]};
+	type Extras = {[key: string]: string|null|number|boolean|Extras|string[]|number[]|number[][]|boolean[]|Extras[]};
 
 	/**
 	* Controls ordering of [[SQLQuery.order]]

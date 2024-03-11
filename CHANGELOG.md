@@ -1,5 +1,101 @@
-# Change Log
+# CHANGELOG
 
+# 4.16.0 &mdash; 2024-02-27
+* [iOS] Modify behaviour of stop-detection system to NOT turn off location-services but merely adjust desiredAccuracy as high as possible.  There were problems reported using `locationAuthorizationRequest: 'WhenInUse'` with recent versions of iOS where the stop-detection system could put the app to sleep during tracking if the motion API reported the device became momentarily stationary.
+
+# 4.15.4 &mdash; 2023-11-16
+* [Android] Fix problem with polygon-geofencing license-validation not working in DEBUG builds when configured with pro
+duct flavors.
+
+## 4.15.3 &mdash; 2023-11-06
+* [Android] HMS geolocation event does not provide a timestamp for the triggering location!!  Use System current time.
+* [Android] Guard against Geofence SQLite query returning null in `GeofencingService`.
+* [Android] Fix `ConcurrentModificationException` in `SingleLocationRequest.getBestLocation`
+
+## 4.15.2 &mdash; 2023-10-12
+* [Android] Fix `IllegalStateException` calling addGeofences when number of geofences exceeds platform maximum (100).
+
+## 4.15.1 &mdash; 2023-10-02
+* [iOS] Fix "*Duplicate symbol error DummyPods_TSLocationManager*".
+* [Android] Fix timeout issue in `.watchPosition`.
+
+## 4.15.0 &mdash; 2023-09-29
+* **Polygon Geofencing**:  The Background Geolocation SDK now supports *Polygon Geofences* (Geofences of any shape).  For more information, see API docs [`Geofence.vertices`](https://transistorsoft.github.io/cordova-background-geolocation-lt/interfaces/geofence.html#vertices).  ℹ️ __*Polygon Geofencing*__ is [sold as a separate add-on](https://shop.transistorsoft.com/products/polygon-geofencing) (fully functional in *DEBUG* builds).
+
+![](https://dl.dropbox.com/scl/fi/sboshfvar0h41azmb4tyv/polygon-geofencing-parc-outremont-400.png?rlkey=d2s0n3zbzu72e7s2gch9kxd4a&dl=1)
+![](https://dl.dropbox.com/scl/fi/xz48myvjnpp8ko0l2tufg/polygon-geofencing-parc-lafontaine-400.png?rlkey=sf20ns959uj0a0fq0atmj55bz&dl=1)
+
+* Remove `backup_rules.xml` from `AndroidManifest.xml` &mdash; it's causing conflicts with other plugins.
+* [Android] Add proguard-rule for compilation of the android library to prevent from obfuscating the `BuildConfig` class to `a.a.class`, conflicting with other libraries.
+* Fix timeout issue with .watchPosition
+
+## 4.14.3 &mdash; 2023-09-05
+* [Android] Performance enhancements and error-checking.
+* [Typescript] Add missing `LocationError` value `3`
+
+## 4.14.2 &mdash; 2023-08-24
+
+* [Android] Fix memory-leak in `.startBackgroundTask`:  If a `Task` timed-out and is "FORCE KILLED", it was never removed from a `List<Task>`.
+* [Android] Fix `Exception NullPointerException:at com.transistorsoft.locationmanager.util.BackgroundTaskWorker.onStopped`
+
+## 4.14.1 &mdash; 2023-08-24
+* [Android] :warning: If you have the following elements defined in your __`config.xml`__ within an `<edit-config>` block, __DELETE__ them:
+```diff
+-       <service android:name="com.transistorsoft.locationmanager.service.TrackingService" android:foregroundServiceType="location" />
+-       <service android:name="com.transistorsoft.locationmanager.service.LocationRequestService" android:foregroundServiceType="location" />
+```
+
+* [iOS] Fix build failure "Use of '@import' when C++ modules are disabled"
+* [Android] Modify Foreground-service management to use `stopSelfResult(startId)` instead of `stopSelf()`.  This could improve reports of Android ANR
+`Context.startForeground`.
+* [Android] Re-factor getCurrentPosition to prefer more recent location vs more accuracy (within limits)
+* [Android] Android 14 (API 34) support:  Android 14 is more strict with scheduling `AlarmManager` "exact alarms" (which the plugin does take advantage of).  If you wish the plugin to use `AlarmManager` "exact alarms" in your app, you must now explicitly define that permission in your own `AndroidManifest`:
+```xml
+<manifest>
+    <uses-permission android:minSdkVersion="34" android:name="android.permission.USE_EXACT_ALARM" />
+</manifest>
+```
+
+* [Android] Android 14 (API 34) support:  Re-factor BackgroundTaskService to use `WorkManager` instead of a foreground-service.
+* [Android] Android 14 (API 34) support: Due to new runtime permission requirements on `AlarmManager` exact alarms (`android.permission.SCHEDULE_EXACT_ALARM`), the plugin can no longer rely upon launching a foreground-service using an exact alarm.  Instead, the plugin will create a geofence around the current position (configured with `initialTriggerEntry`) to hopefully immediately launch a foreground-service to handle the fake geofence event, since Android allows foreground-service launches due to Geofencing events.
+* [Android] Android 14 (API 34) support:  All foreground-services now require an `android:foregroundServiceType` in the plugin's `AndroidManifest` (handled automatically by the plugin).
+* [Android] Android 14 (API 34) support: Fix error "*One of RECEIVER_EXPORTED or RECEIVER_NOT_EXPORTED should be specified*" in `DeviceSettings.startMonitoringPowerSaveChanges`.
+* [Android] Add sanity-check for invalid `Geofence` arguments (eg: invalid latitude/longitude).
+* [Android] Add safety-checks in ForegroundService stop-handling.  There was a report of a *reproducible* crash while aggressively calling `.getCurrentPosition` in a `Timer` (eg: every second).
+* [Android] Demote `HeartbeatService` from a Foreground Service to `AlarmManager` ONESHOT.  :warning: In your `onHeartbeat` event, if you intend to perform any kind of asynchronous function, you should wrap it inside `BackgroundGeolocation.startBackgroundTask` in order to prevents the OS from suspending your app before your task is complete:
+
+```javascript
+BacckgroundGeolocation.onHeartbeat(async (event) => {
+  console.log("[onHeartbeat] $event");
+  // First register a background-task.
+  const taskId = await BackgroundGeolocation.startBackgroundTask();
+  try {
+    // Now you're free to perform long-running tasks, such as getCurrentPosition()
+    const location = await BackgroundGeolocation.getCurrentPosition({
+      samples: 3,
+      timeout: 30,
+      extras: {
+        "event": "heartbeat"
+      }
+    });
+    console.log("[onHeartbeat] location:", $location);
+  } catch(error) {
+    console.log("[getCurrentPosition] ERROR:", error);
+  }
+  // Be sure to singal completion of your background-task:
+  BackgroundGeolocation.stopBackgroundTask(taskId);
+});
+```
+
+* [Android] Fix NPE iterating a `List` in `AbstractService`.
+* [Android] If a `SingleLocationRequest` error occurs and at least one sample exits, prefer to resolve the request successfully rather than firing the error (eg: `getCurrentPosition`, `motionchange`, `providerchange` requests).
+
+## 4.13.1 &mdash; 2023-07-14
+* [iOS] Use cocoapods source url from CDN instead of Git clone
+
+## 4.13.0 &mdash; 2023-07-12
+* [iOS] Migrate `<framework type="podspec" />` for `CocoaLumberjack` dependency to new `<podspec>` definition in `plugin.xml`, required for `cordova-ios >= 7.0.0.
+##
 ## 4.12.0 &mdash; 2023-05-04
 * [iOS] iOS 16.4 made a major change to location-services, exposed only when `Config.showsBackgroundLocationIndicator` is `false` (the default).  As a result of this change, `Config.showsBackgroundLocationIndicator` will now default to `true`.
 

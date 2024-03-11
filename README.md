@@ -116,7 +116,22 @@ $ cordova plugin add https://github.com/transistorsoft/cordova-background-geoloc
 </platform>
 ```
 
-### Huawei Mobile Services (HMS) Support
+#### Polygon Geofencing Add-on
+
+If you've purchased a license for the [Polygon Geofencing add-on](https://shop.transistorsoft.com/products/polygon-geofencing), add the following license key to your __`AndroidManifest`__ (Polygon Geofencing is fully functional in DEBUG builds so you can try before you buy):
+
+```xml
+<platform name="android">
+      <!-- Cordova Background Geolocation License -->
+      <config-file parent="/manifest/application" target="app/src/main/AndroidManifest.xml">
+          <meta-data
+            android:name="com.transistorsoft.locationmanager.polygon.license"
+            android:value="YOUR_POLYGON_LICENSE_KEY_HERE" />
+      </config-file>
+</platform>
+```
+
+#### Huawei Mobile Services (HMS) Support
 
 If you've [purchased an *HMS Background Geolocation* License](https://shop.transistorsoft.com/collections/frontpage/products/huawei-background-geolocation) for installing the plugin on _Huawei_ devices without *Google Play Services* installed, add your *HMS Background Geolocation* license key:
 
@@ -138,7 +153,23 @@ If you've [purchased an *HMS Background Geolocation* License](https://shop.trans
 ```
 :warning: Huawei HMS support requires `cordova-background-geolocation >= 3.11.0`.
 
-### AndroidX (`cordova-android >= 9.0.0`)
+#### `AlarmManager` "Exact Alarms" (optional)
+
+The plugin uses __`AlarmManager`__ "exact alarms" for precise scheduling of events (eg: __`Config.stopTimeout`__, __`Config.motionTriggerDelay`__, __`Config.schedule`__).  *Android 14 (SDK 34)*, has restricted usage of ["`AlarmManager` exact alarms"](https://developer.android.com/about/versions/14/changes/schedule-exact-alarms).  To continue using precise timing of events with *Android 14*, you can manually add this permission to your __`AndroidManifest`__.  Otherwise, the plugin will gracefully fall-back to "*in-exact* `AlarmManager` scheduling".  For more information about Android's __`AlarmManager`__, see the [Android API Docs](https://developer.android.com/training/scheduling/alarms).
+
+:open_file_folder: In your __`config.xml`__, add the following block within the __`<platform name="android">`__ block (**exactly as-shown**:
+
+```xml
+  <platform name="android">
+      <config-file parent="/manifest" target="app/src/main/AndroidManifest.xml">
+          <uses-permission android:minSdkVersion="34" android:name="android.permission.USE_EXACT_ALARM" />
+      </config-file>
+  </platform>
+```
+
+:warning: It has been announced that *Google Play Store* [has plans to impose greater scrutiny](https://support.google.com/googleplay/android-developer/answer/13161072?sjid=3640341614632608469-NA) over usage of this permission (which is why the plugin does not automatically add it).
+
+#### AndroidX (`cordova-android >= 9.0.0`)
 
 It's *highly* recommended to configure your app for *Android X* when using *Cordova 10* / `cordova-android >= 9.0.0`.
 
