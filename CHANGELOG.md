@@ -1,9 +1,60 @@
 # CHANGELOG
 
-# 4.16.0 &mdash; 2024-02-27
+## 4.17.3 &mdash; 2024-11=12
+* [Android] Remove enforcement of minimum Geofence radius `150`
+* [Android] Fix issue with `TSLocationManagerActivity` (responsible for showing location permission / authorization dialogs).  Minimizing the app with an active permission dialog would cause the app's `MainActivity` to terminate on some devices.
+
+## 4.17.3 &mdash; 2024-11-08
+* [Android] Fix reported "screen flickering" issue on some devices when SDK requests permissions.
+* [Android] Address Android synchronization issue with `TSLocation.toMap`.
+* [iOS] Address crash in `TSConfig` due to "uncaught exception NSInvalidArgumentException"
+* [Android] Change `foregroundServiceType` on `LocationRequestService` from `shortService` -> `location`.
+* [iOS] Address inconsistent location-tracking performance on iOS.
+
+## 4.17.2 &mdash; 2024-10-23
+* [iOS] Fix bug with `triggerActivites` preventing motion-triggering in iOS simulator with simulated location.
+
+## 4.17.1 &mdash; 2024-10-21
+* [Android] Implement `Service.onTimeout` to handle `foregroundServiceType="shortService"` timeouts.
+* [iOS] Add new `Config.activityType` `ACTIVITY_TYPE_AIRBORNE`.
+* [iOS] Implement `Config.triggerActivities` for iOS.
+* [Android] Guard against `NullPointerException` receiving a null location in `PolygonGeofenceService` event.
+* [Android] Address possible leak of `Activity` reference when terminating the app.  Ensure internal reference to `Activity` is nullified when app is terminated.
+* [Android] Add improvements to Android geofencing-only mode with `goefenceModeHighAccuracy: true` where motion-activity updates disabled.
+* [Android] Add error-checking in polygon-geofencing to handle a possible `NullPointerException`.
+* [iOS] Fix broken linking to Settings screen in `locationAuthorizationAlert` on iOS 18.
+
+## 4.17.0 &mdash; 2024-09-04
+* [iOS] Fix bug in iOS *Polygon Geofencing* when running in geofences-only mode (`.startGeofences`).  iOS would mistakenly turn off location updates exactly 3 samples into the containing circular geofence of a polygon.
+* Implement `notifyOnDwell` for polygon-geofences.
+
+## 4.16.5 &mdash; 2024-06-12
+* [Android] Remove permission `FOREGROUND_SERVICE_HEALTH`.  It turns out that this permission is no longer required whe
+n the `ActivityRecognitionServivce` is defined with a `foregroundServiceType="shortservice"`, instead of `"health"`, which allows a background
+-launched foreground-service to stay active for up to 3 minutes, which is sufficient for the `ActivityRecognitionServic
+e`, which typically stays activated only for a few milliseconds.
+* [Android] Fix "Multiple geofence events triggered for a single geofence registration when registered individually".
+
+## 4.16.4 &mdash; 2024-05-14
+* [Android] Fix bug in .getCurrentPosition not returning or throwing an error in a condition where Network OFF and GPS ON.
+
+## 4.16.3 &mdash; 2024-04-22
+* [iOS] Code-sign `TSLocationManager.xcframework` with new Apple Organization (*9224-2932 Quebec Inc*) certificate.
+
+## 4.16.2 &mdash; 2024-04-08
+* [iOS] Implement new [iOS Privacy Manifest](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files?language=objc) (__See Updated iOS Setup Instructions in README__).
+* [iOS] codesign `TSBackgroundGeolocation.xcframework`
+
+## 4.16.1 &mdash; 2024-03-19
+* [iOS] Fix bug in iOS scheduler, triggering ON incorrectly.  For example, given a `schedule: ['1 00:00-23:59'], the plu
+gin was trigging on for `DAY 2`.
+* [iOS] Fix bug in polygon-geofencing:  monitoredIdentifiers not being cleared when `.removeGeofences()` is called, can result in null-pointer exception.
+* [Android] Change `foregroundServiceType` of the SDK's `GeofencingService` definition in its `AndroidManifest` from `shortService` -> `location`.
+
+## 4.16.0 &mdash; 2024-02-27
 * [iOS] Modify behaviour of stop-detection system to NOT turn off location-services but merely adjust desiredAccuracy as high as possible.  There were problems reported using `locationAuthorizationRequest: 'WhenInUse'` with recent versions of iOS where the stop-detection system could put the app to sleep during tracking if the motion API reported the device became momentarily stationary.
 
-# 4.15.4 &mdash; 2023-11-16
+## 4.15.4 &mdash; 2023-11-16
 * [Android] Fix problem with polygon-geofencing license-validation not working in DEBUG builds when configured with pro
 duct flavors.
 

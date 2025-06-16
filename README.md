@@ -230,7 +230,7 @@ $ cordova platform add android
 Sets the desired version of `play-services-location` dependency.  Many other plugins require `play-services` dependencies, (eg: `cordova-plugin-googlemaps`, `phonegap-plugin-push`):  If the version of `play-services` and/or `firebase` is not aligned to the **same** version for **ALL** plugins, your build **will fail**.
 
 ```
-$ cordova plugin add <git-url> --variable GOOGLE_API_VERSION=20.0.0
+$ cordova plugin add cordova-background-geolocation-lt --variable GOOGLE_API_VERSION=20.0.0
 ```
 
 ##### `@variable OKHTTP_VERSION ["3.12.+"]`
@@ -263,6 +263,66 @@ Paste **all** the following elements into the `<platform name="ios">` container:
     </config-file>
     <!-- /background-geolocation -->
 </platform>
+```
+
+#### Privacy Manifest
+
+Apple now requires apps provide a [Privacy Manifest for "sensitive" APIs](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api?language=objc) which could be abused for "fingerprinting" a user for malicious marketing activity.
+
+:warning: You **MUST** upgrade your `cordova-ios` platform to [`>= 7.1.0` for *iOS Privacy Manifest Support*](https://github.com/apache/cordova-ios/blob/master/RELEASENOTES.md#710-apr-01-2024):
+
+- :open_file_folder: __`config.xml`__
+- Add the following `<privacy-manifest>` __four__ block within the `NSPrivacyAccessedAPITypes` container:
+
+```xml
+  <platform name="ios">
+      <privacy-manifest>
+          <key>NSPrivacyAccessedAPITypes</key>
+          <array>
+              <!-- [1] cordova-background-fetch: UserDefaults -->
+              <dict>
+                  <key>NSPrivacyAccessedAPIType</key>
+                  <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+
+                  <key>NSPrivacyAccessedAPITypeReasons</key>
+                  <array>
+                      <string>CA92.1</string>
+                  </array>
+              </dict>
+
+              <!-- [2] cordova-background-geolocation: UserDefaults -->
+              <dict>
+                  <key>NSPrivacyAccessedAPIType</key>
+                  <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+
+                  <key>NSPrivacyAccessedAPITypeReasons</key>
+                  <array>
+                      <string>CA92.1</string>
+                      <string>1C8F.1</string>
+                  </array>
+              </dict>
+              <!-- [3] cordova-background-geolocation (CocoaLumberjack): FileTimestamp -->
+              <dict>
+                  <key>NSPrivacyAccessedAPIType</key>
+                  <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+                  <key>NSPrivacyAccessedAPITypeReasons</key>
+                  <array>
+                      <string>C617.1</string>
+                      <string>0A2A.1</string>
+                  </array>
+              </dict>
+              <!-- [4] cordova-background-geolocation (CocoaLumberjack): DiskSpace -->
+              <dict>
+                  <key>NSPrivacyAccessedAPIType</key>
+                  <string>NSPrivacyAccessedAPICategoryDiskSpace</string>
+                  <key>NSPrivacyAccessedAPITypeReasons</key>
+                  <array>
+                      <string>E174.1</string>
+                  </array>
+              </dict>
+          </array>
+      </privacy-manifest>
+  </platform>
 ```
 
 #### Configuring for `useSignificantChangesOnly`
